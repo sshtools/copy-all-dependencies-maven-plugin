@@ -83,7 +83,7 @@ public class CopyAllDependenciesMojo extends AbstractMojo {
 	@Parameter(defaultValue = "true", property = "includeClassifier")
 	private boolean includeClassifier;
 
-	@Parameter(defaultValue = "true", property = "resolvedSnapshotVersion")
+	@Parameter(defaultValue = "false", property = "resolvedSnapshotVersion")
 	private boolean resolvedSnapshotVerssion;
 
 	@Parameter(defaultValue = "${session}", required = true, readonly = true)
@@ -228,6 +228,8 @@ public class CopyAllDependenciesMojo extends AbstractMojo {
 			getLog().debug("Resolving " + coordinate + " with transitive dependencies");
 			for (ArtifactResult result : dependencyResolver.resolveDependencies(buildingRequest, coordinate, null)) {
 
+				getLog().info("  with " + result.getArtifact());
+			
 				/*
 				 * If the coordinate is for an extension zip, then we only we transitive
 				 * dependencies that also have an extension zip
