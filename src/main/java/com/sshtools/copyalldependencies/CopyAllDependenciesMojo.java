@@ -80,8 +80,11 @@ public class CopyAllDependenciesMojo extends AbstractMojo {
 	@Parameter(property = "defaultType")
 	private String defaultType;
 
-	@Parameter(defaultValue = "true")
+	@Parameter(defaultValue = "true", property = "includeClassifier")
 	private boolean includeClassifier;
+
+	@Parameter(defaultValue = "true", property = "resolvedSnapshotVersion")
+	private boolean resolvedSnapshotVerssion;
 
 	@Parameter(defaultValue = "${session}", required = true, readonly = true)
 	private MavenSession session;
@@ -249,7 +252,7 @@ public class CopyAllDependenciesMojo extends AbstractMojo {
 
 		Path extensionZip = file.toPath();
 		try {
-			Path target = checkDir(outputDirectory.toPath()).resolve(getFileName(artifact, includeVersion, includeClassifier));
+			Path target = checkDir(outputDirectory.toPath()).resolve(getFileName(artifact));
 			getLog().debug("Copying jar artifact " + artifact.getArtifactId() + " to " + target);
 			Files.copy(extensionZip, target, StandardCopyOption.REPLACE_EXISTING);
 		} catch (IOException e) {
@@ -258,25 +261,24 @@ public class CopyAllDependenciesMojo extends AbstractMojo {
 
 	}
 
-	private String getFileName(Artifact a, boolean includeVersion, boolean includeClassifier) {
-		return getFileName(a.getArtifactId(), a.getVersion(), a.getClassifier(),
-				a.getType(), includeVersion, includeClassifier);
-	}
-
-	private String getFileName(String artifactId, String version, String classifier, String type,
-			boolean includeVersion, boolean includeClassifier) {
+	private String getFileName(Artifact a) {
 		StringBuilder fn = new StringBuilder();
-		fn.append(artifactId);
+		fn.append(a.getArtifactId());
 		if (includeVersion) {
 			fn.append("-");
-			fn.append(version);
+			if(resolvedSnapshotVerssion) {
+				fn.append(a.getVersion());
+			}
+			else {
+				fn.append("SNAPSHOT");
+			}
 		}
-		if (includeClassifier && classifier != null && classifier.length() > 0) {
+		if (includeClassifier && a.getClassifier() != null && a.getClassifier().length() > 0) {
 			fn.append("-");
-			fn.append(classifier);
+			fn.append(a.getClassifier());
 		}
 		fn.append(".");
-		fn.append(type);
+		fn.append(a.getType());
 		return fn.toString();
 	}
 
