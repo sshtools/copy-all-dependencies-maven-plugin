@@ -83,8 +83,8 @@ public class CopyAllDependenciesMojo extends AbstractMojo {
 	@Parameter(defaultValue = "true", property = "includeClassifier")
 	private boolean includeClassifier;
 
-	@Parameter(defaultValue = "false", property = "resolvedSnapshotVersion")
-	private boolean resolvedSnapshotVerssion;
+	@Parameter(defaultValue = "true", property = "baseVersion")
+	private boolean baseVersion;
 
 	@Parameter(defaultValue = "${session}", required = true, readonly = true)
 	private MavenSession session;
@@ -268,11 +268,11 @@ public class CopyAllDependenciesMojo extends AbstractMojo {
 		fn.append(a.getArtifactId());
 		if (includeVersion) {
 			fn.append("-");
-			if(resolvedSnapshotVerssion) {
-				fn.append(a.getVersion());
+			if(baseVersion) {
+				fn.append(a.getBaseVersion());
 			}
 			else {
-				fn.append("SNAPSHOT");
+				fn.append(a.getVersion());
 			}
 		}
 		if (includeClassifier && a.getClassifier() != null && a.getClassifier().length() > 0) {
